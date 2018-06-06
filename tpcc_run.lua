@@ -219,6 +219,7 @@ function new_order()
 
   end
 
+  con:query("insert into notpm (id) values (NULL)")
   con:query("COMMIT")
 
 end

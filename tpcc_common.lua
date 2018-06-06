@@ -314,6 +314,18 @@ function create_tables(drv, con, table_num)
 
    con:query(query)
 
+-- notpm stat table
+   query = string.format([[
+	CREATE TABLE IF NOT EXISTS notpm (
+  	id int NOT NULL AUTO_INCREMENT,
+  	done tinyint NOT NULL DEFAULT '0',
+  	PRIMARY KEY (id),
+  	KEY idx_ts (done)
+	) %s %s]],
+	engine_def, extra_table_options)
+
+   con:query(query)
+   
    con:bulk_insert_init("INSERT INTO item" .. i .." (i_id, i_im_id, i_name, i_price, i_data) values")
    for j = 1 , MAXITEMS do
       local i_im_id = sysbench.rand.uniform(1,10000)
@@ -600,6 +612,7 @@ function cleanup()
       con:query("DROP TABLE IF EXISTS stock" .. i )
       con:query("DROP TABLE IF EXISTS item" .. i )
       con:query("DROP TABLE IF EXISTS warehouse" .. i )
+      con:query("DROP TABLE IF EXISTS notpm")
    end
 end
 

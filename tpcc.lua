@@ -64,11 +64,37 @@ end
 
 function sysbench.hooks.report_intermediate(stat)
 -- --   print("my stat: ", val)
-   if  sysbench.opt.report_csv == "yes" then
-   	sysbench.report_csv(stat)
-   else
-   	sysbench.report_default(stat)
+   local recent_notpm
+   local last_maxid
+   if not con then
+	thread_init()
    end
+   recent_notpm, last_maxid = con:query_row("select count(id), max(id) from notpm where done = 0")
+   if not last_maxid then
+	last_maxid = con:query_row("select count(id), max(id) from notpm")
+   end
+   con:query(([[update notpm set done = 1 where id <= %d]]):format(last_maxid))
+   con:query("commit")
+   time = os.date("*t")
+   print(("%02d:%02d:%02d"):format(time.hour, time.min, time.sec) .. " Number of New Order Transactions: " .. recent_notpm)
+   --if  sysbench.opt.report_csv == "yes" then
+   --	sysbench.report_csv(stat)
+   --else
+   --	sysbench.report_default(stat)
+   --end
+end
+
+function sysbench.hooks.report_cumulative(stat)
+   local total_notpm
+   local avg_notpm
+   if not con then
+	thread_init()
+   end
+   total_notpm = con:query_row("select count(id) from notpm")
+
+   avg_notpm = total_notpm/sysbench.opt.time
+   print(total_notpm .. " new order transactions done during " .. sysbench.opt.time .. " second for an average of: " .. avg_notpm .. " transactions per seconds")
+   con:query("truncate notpm")
 end
 
 
