@@ -92,8 +92,8 @@ function sysbench.hooks.report_cumulative(stat)
    end
    total_notpm = con:query_row("select count(id) from notpm")
 
-   avg_notpm = total_notpm/sysbench.opt.time
-   print(total_notpm .. " new order transactions done during " .. sysbench.opt.time .. " second for an average of: " .. avg_notpm .. " transactions per seconds")
+   avg_notpm = total_notpm/sysbench.opt.time*60
+   print(total_notpm .. " new order transactions done during " .. sysbench.opt.time .. " second for an average of: " .. avg_notpm .. " transactions per minute (NOTPM)")
    con:query("truncate notpm")
 end
 
